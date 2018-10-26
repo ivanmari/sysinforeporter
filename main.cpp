@@ -55,9 +55,7 @@ int main(int argc, char *argv[])
                 if(match.hasMatch())
                 {
                     QFileInfo file_info(match.captured(0));
-                    qInfo() << file_info.absoluteFilePath() << " " << file_info.size() << " bytes";
                     out << "File : " << file_info.absoluteFilePath() << " " << file_info.size() << " bytes" << endl;
-;
                 }
             }
             //QThread::msleep(1);
