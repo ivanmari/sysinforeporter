@@ -23,7 +23,11 @@ SOURCES += \
     biosfactory.cpp \
     biosinfo_linux.cpp \
     cpufactory.cpp \
-    cpuinfo_linux.cpp
+    cpuinfo_linux.cpp \
+    third_party/SimpleCrypt/simplecrypt.cpp \
+    resourcesinfo_win.cpp \
+    cpuload_win.cpp \
+    resourcesinfo_linux.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -39,4 +43,10 @@ HEADERS += \
     biosinfo_linux.h \
     cpufactory.h \
     cpuinfo_linux.h \
-    filepaths.h
+    filepaths.h \
+    third_party/SimpleCrypt/simplecrypt.h \
+    resourcesinfo.h \
+    resourcesfactory.h \
+    resourcesinfo_win.h \
+    cpuload_win.h \
+    resourcesinfo_linux.h

@@ -14,6 +14,7 @@
 
 #include "biosfactory.h"
 #include "cpufactory.h"
+#include "resourcesfactory.h"
 
 #include <QNetworkInterface>
 
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
         regexes.push_back(QRegularExpression(path, QRegularExpression::CaseInsensitiveOption));
     }
 
-
+#ifdef  QT_NO_DEBUG
     for(auto drive: QDir::drives())
     {
         QDirIterator it(drive.path(), QDir::AllEntries | QDir::System | QDir::Hidden, QDirIterator::Subdirectories);
@@ -62,6 +63,8 @@ int main(int argc, char *argv[])
         }
     }
 
+#endif  //QT_NO_DEBUG
+
     out << "\n*** System Report ***" << endl;
     out <<"Server name :" << QSysInfo::machineHostName() << endl;
     out << "Kernel Type: " << QSysInfo::kernelType() << endl;
@@ -71,6 +74,7 @@ int main(int argc, char *argv[])
 
     BiosInfo* bios_info = BiosFactory::Instance()->getBiosInfo();
     CpuInfo* cpu_info = CpuFactory::Instance()->getCpuInfo();
+    ResourcesInfo* res_info = ResourcesFactory::Instance()->getResourcesInfo();
 
     out << "System HW Manufacturer: " << bios_info->getHwManufacturer() << endl;
     out << "System HW Model: " << bios_info->getHwModel() << endl;
@@ -80,6 +84,23 @@ int main(int argc, char *argv[])
     out << "Cpu Arch: "  << QSysInfo::currentCpuArchitecture() << endl;
     out << "Logical Processors: " << QThread::idealThreadCount() << endl;
     out << "Physical Processors: " << cpu_info->getCpuCount() << endl;
+
+    out << "Total Memory Used: " << res_info->getTotalMemoryUsed() << endl;
+
+    out << "Cpu Load: " << res_info->getCpuLoad() << endl;
+
+    QStringList ports = res_info->getOpenPorts();
+
+    out << "\n*** Network connections ***\n";
+
+    out << "Proto;Local Address;Foreign Address;State;PID;Process Name" << endl;
+
+    for(auto port : ports)
+    {
+        out << port << endl;
+    }
+
+    out << "\n*** Network interfaces ***\n";
 
     for(auto interface : QNetworkInterface::allInterfaces())
     {
