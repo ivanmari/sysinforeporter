@@ -27,7 +27,8 @@ SOURCES += \
     third_party/SimpleCrypt/simplecrypt.cpp \
     resourcesinfo_win.cpp \
     cpuload_win.cpp \
-    resourcesinfo_linux.cpp
+    resourcesinfo_linux.cpp \
+    consolereader.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -49,4 +50,5 @@ HEADERS += \
     resourcesfactory.h \
     resourcesinfo_win.h \
     cpuload_win.h \
-    resourcesinfo_linux.h
+    resourcesinfo_linux.h \
+    consolereader.h

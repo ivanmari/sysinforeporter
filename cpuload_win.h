@@ -1,6 +1,10 @@
 #ifndef CPULOAD_WIN_H
 #define CPULOAD_WIN_H
 
+#include <QtGlobal>
+
+#ifdef Q_OS_WIN
+
 #include "Windows.h"
 
 
@@ -21,5 +25,7 @@ private:
 
     void GetSystemTimesAddress();
 };
+
+#endif // Q_OS_WIN
 
 #endif // CPULOAD_WIN_H

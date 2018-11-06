@@ -1,3 +1,7 @@
+#include <QtGlobal>
+
+#ifdef Q_OS_WIN
+
 #include "cpuload_win.h"
 #include "QtDebug"
 
@@ -86,3 +90,4 @@ CpuLoad_Win::~CpuLoad_Win()
     m_pfnGetSystemTimes = NULL;
 
 }
+#endif // Q_OS_WIN

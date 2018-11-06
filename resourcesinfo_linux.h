@@ -11,8 +11,7 @@ class ResourcesInfo_Linux : public ResourcesInfo
 {
 public:
     ResourcesInfo_Linux();
-public:
-    ResourcesInfo_Win();
+
     float getTotalMemoryUsed();
     int getCpuLoad();
     QStringList getOpenPorts();

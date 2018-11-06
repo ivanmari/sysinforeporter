@@ -4,6 +4,7 @@
 #include "QtGlobal"
 
 #include "resourcesinfo_win.h"
+#include "resourcesinfo_linux.h"
 
 class ResourcesFactory
 {
