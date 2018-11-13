@@ -1,22 +1,19 @@
 #include <QCoreApplication>
 #include<QDebug>
-
 #include <QRegularExpressionMatch>
 #include <QRegularExpression>
-
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
 #include <QDirIterator>
-
 #include <QSysInfo>
 #include<QThread>
+#include <QNetworkInterface>
 
 #include "biosfactory.h"
 #include "cpufactory.h"
 #include "resourcesfactory.h"
-
-#include <QNetworkInterface>
+#include "s3uploader.h"
 
 #include "filepaths.h"
 
@@ -24,7 +21,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile report(QSysInfo::machineHostName() + ".txt");
+    QString report_name {QSysInfo::machineHostName() + ".txt"};
+    QFile report{report_name};
 
     if(!report.open(QIODevice::WriteOnly | QIODevice::Text))
         return -1;
@@ -107,6 +105,8 @@ int main(int argc, char *argv[])
         out << "IF: " << interface.humanReadableName();
         out << " MAC Address# " << " : " << interface.hardwareAddress() << endl;
     }
+
+    S3Uploader::put("./" + report_name, report_name);
 
     qInfo() << "Done!";
 
