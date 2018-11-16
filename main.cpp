@@ -9,28 +9,79 @@
 #include <QSysInfo>
 #include<QThread>
 #include <QNetworkInterface>
+#include <QCommandLineParser>
+
+#include <iostream>
 
 #include "biosfactory.h"
 #include "cpufactory.h"
 #include "resourcesfactory.h"
 #include "s3uploader.h"
+#include "passwordreader.h"
 
 #include "filepaths.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+    QCommandLineParser parser;
+
+    QCoreApplication::setApplicationName("System Info Report");
+    QCoreApplication::setApplicationVersion("0.2.2");
+
+    const QCommandLineOption userOption("u", "The username", "username");
+    parser.addOption(userOption);
+    parser.addHelpOption();
+    const QCommandLineOption versionOption = parser.addVersionOption();
+
+    if (!parser.parse(QCoreApplication::arguments()))
+    {
+        qInfo() << parser.errorText();
+        return -1;
+    }
+
+    if (parser.isSet(versionOption))
+    {
+        std::cout << qPrintable(QCoreApplication::applicationName()) << " " <<
+                     qPrintable(QCoreApplication::applicationVersion());
+        return 0;
+    }
+
+
+    QString username;
+
+    if (parser.isSet(userOption))
+    {
+        username = parser.value(userOption);
+    }
+    else
+    {
+        std::cout << parser.helpText().toStdString();
+        return -1;
+    }
+
+    QString password = PasswordReader::askPassword();
+
+    QString concatenated = username + ":" + password;
+    QByteArray data = concatenated.toLocal8Bit().toBase64();
+    QString headerData = "Basic " + data;
+
+    password.clear();
+    concatenated.clear();
+    data.clear();
 
     QString report_name {QSysInfo::machineHostName() + ".txt"};
     QFile report{report_name};
 
     if(!report.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qInfo() << "Error: Cannot create report file";
         return -1;
+    }
 
     QTextStream out(&report);
 
-
-    qInfo() << "Processing...";
+    qInfo() << "Processing files. This could take several minutes ...";
 
     out << "*** Files Report ***" << endl;
 
@@ -106,7 +157,12 @@ int main(int argc, char *argv[])
         out << " MAC Address# " << " : " << interface.hardwareAddress() << endl;
     }
 
-    S3Uploader::put("./" + report_name, report_name);
+    const QString s3_filename = username + "%2F" + report_name;
+    const QString local_path = "./" + report_name;
+
+    qInfo() << "Uploading report";
+
+    S3Uploader::put(headerData, local_path, s3_filename);
 
     qInfo() << "Done!";
 

@@ -10,7 +10,7 @@ class S3Uploader
 {
 public:
 
-    static void put(FilePath filepath, FileName filename);
+    static void put(QString basic_auth, FilePath filepath, FileName filename);
 };
 
 #endif // S3UPLOADER_H

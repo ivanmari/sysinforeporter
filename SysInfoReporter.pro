@@ -29,7 +29,8 @@ SOURCES += \
     cpuload_win.cpp \
     resourcesinfo_linux.cpp \
     consolereader.cpp \
-    s3uploader.cpp
+    s3uploader.cpp \
+    passwordreader.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -53,4 +54,5 @@ HEADERS += \
     cpuload_win.h \
     resourcesinfo_linux.h \
     consolereader.h \
-    s3uploader.h
+    s3uploader.h \
+    passwordreader.h
