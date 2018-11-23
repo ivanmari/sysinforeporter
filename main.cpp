@@ -31,14 +31,13 @@ int main(int argc, char *argv[])
 
     const QCommandLineOption userOption("u", "The username", "username");
     parser.addOption(userOption);
+    const QCommandLineOption disableSearchOption(QStringList() << "n" << "nosearch", "Disables file search");
+    parser.addOption(disableSearchOption);
     parser.addHelpOption();
+    //parser.setApplicationDescription("");
     const QCommandLineOption versionOption = parser.addVersionOption();
 
-    if (!parser.parse(QCoreApplication::arguments()))
-    {
-        qInfo() << parser.errorText();
-        return -1;
-    }
+    parser.process(QCoreApplication::arguments());
 
     if (parser.isSet(versionOption))
     {
@@ -93,25 +92,27 @@ int main(int argc, char *argv[])
     }
 
 #ifdef  QT_NO_DEBUG
-    for(auto drive: QDir::drives())
+    if(!parser.isSet(disableSearchOption))
     {
-        QDirIterator it(drive.path(), QDir::AllEntries | QDir::System | QDir::Hidden, QDirIterator::Subdirectories);
-        while (it.hasNext()) {
-            QString path = it.next();
+        for(auto drive: QDir::drives())
+        {
+            QDirIterator it(drive.path(), QDir::AllEntries | QDir::System | QDir::Hidden, QDirIterator::Subdirectories);
+            while (it.hasNext()) {
+                QString path = it.next();
 
-            for(auto re : regexes)
-            {
-                QRegularExpressionMatch match = re.match(path);
-                if(match.hasMatch())
+                for(auto re : regexes)
                 {
-                    QFileInfo file_info(match.captured(0));
-                    out << "File : " << file_info.absoluteFilePath() << " " << file_info.size() << " bytes" << endl;
+                    QRegularExpressionMatch match = re.match(path);
+                    if(match.hasMatch())
+                    {
+                        QFileInfo file_info(match.captured(0));
+                        out << "File : " << file_info.absoluteFilePath() << " " << file_info.size() << " bytes" << endl;
+                    }
                 }
+                //QThread::msleep(1);
             }
-            //QThread::msleep(1);
         }
     }
-
 #endif  //QT_NO_DEBUG
 
     out << "\n*** System Report ***" << endl;
