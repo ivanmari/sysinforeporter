@@ -91,19 +91,34 @@ ResourcesInfo_Linux::getTotalMemoryUsed()
 int
 ResourcesInfo_Linux::getCpuLoad()
 {
-    QThread::msleep(100);
-    QStringList top_text = ConsoleReader::callProcess("top -b -n1");
+    QStringList top_text = ConsoleReader::callProcess("top -b -n2");
     int cpu_load = -1;
-    for(auto line : top_text)
+    size_t row_count = 0;
+    QRegExp number_rx( "(\\d*\\.\\d).*");
+    for(int i = 0; i < top_text.size(); ++i)
     {
+        QString line = top_text[i];
+
         QStringList attr = line.split(" ", QString::SkipEmptyParts);
 
-        if(attr.size() >= 4 && attr.at(0).contains("%Cpu(s)"))
-        {
-            cpu_load = attr.at(1).toFloat() + attr.at(3).toFloat();
+        QString a,b;
+        if(attr.size() >= 4 && attr.at(0).contains("Cpu(s)"))
+        {   row_count++;
+            if(row_count == 2)
+            {
+                if(attr.at(1).contains(number_rx))
+                {
+                    a = number_rx.cap(1);
+                    if(attr.at(3).contains(number_rx))
+                    {
+                        b = number_rx.cap(1);
+                        cpu_load = a.toFloat() + b.toFloat();
+                    }
+                }
+            }
         }
-
     }
+
     return cpu_load;
 }
 

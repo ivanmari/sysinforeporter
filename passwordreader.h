@@ -1,7 +1,7 @@
 #ifndef PASSWORDREADER_H
 #define PASSWORDREADER_H
 
-#include <QString.h>
+#include <QString>
 
 class PasswordReader
 {
