@@ -1,5 +1,5 @@
 #include <QCoreApplication>
-#include<QDebug>
+#include <QDebug>
 #include <QRegularExpressionMatch>
 #include <QRegularExpression>
 #include <QFile>
@@ -7,9 +7,13 @@
 #include <QDir>
 #include <QDirIterator>
 #include <QSysInfo>
-#include<QThread>
+#include <QThread>
 #include <QNetworkInterface>
 #include <QCommandLineParser>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QDateTime>
 
 #include <iostream>
 
@@ -69,20 +73,19 @@ int main(int argc, char *argv[])
     concatenated.clear();
     data.clear();
 
-    QString report_name {QSysInfo::machineHostName() + ".txt"};
-    QFile report{report_name};
+    QJsonObject js_collected_data;
+    QJsonObject js_system_info;
+    QJsonObject js_os_info;
+    QJsonObject js_hw_info;
+    QJsonObject js_cpu_info;
+    QJsonObject js_res_info;
+    QJsonArray js_ports;
+    QJsonArray js_nets;
+    QJsonArray js_files;
 
-    if(!report.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        qInfo() << "Error: Cannot create report file";
-        return -1;
-    }
-
-    QTextStream out(&report);
+    js_collected_data.insert("timestamp", QJsonValue::fromVariant(QDateTime::currentDateTimeUtc()));
 
     qInfo() << "Processing files. This could take several minutes ...";
-
-    out << "*** Files Report ***" << endl;
 
     std::vector<QRegularExpression> regexes;
 
@@ -106,57 +109,79 @@ int main(int argc, char *argv[])
                     if(match.hasMatch())
                     {
                         QFileInfo file_info(match.captured(0));
-                        out << "File : " << file_info.absoluteFilePath() << " " << file_info.size() << " bytes" << endl;
+                        js_files.push_back(QJsonValue::fromVariant(file_info.absoluteFilePath()));
                     }
                 }
                 //QThread::msleep(1);
             }
         }
     }
-#endif  //QT_NO_DEBUG
 
-    out << "\n*** System Report ***" << endl;
-    out <<"Server name :" << QSysInfo::machineHostName() << endl;
-    out << "Kernel Type: " << QSysInfo::kernelType() << endl;
-    out << "Kernel Version: " << QSysInfo::kernelVersion() << endl;
-    out << "Pretty Product Name: "  << QSysInfo::prettyProductName() << endl;
-    out << "\n*** HW Report ***" << endl;
+#endif  //QT_NO_DEBUG
+    js_system_info.insert("files", js_files);
+    js_system_info.insert("server_name", QJsonValue::fromVariant(QSysInfo::machineHostName()));
+
+    js_os_info.insert("kernel_type", QJsonValue::fromVariant(QSysInfo::kernelType()));
+    js_os_info.insert("kernel_version", QJsonValue::fromVariant(QSysInfo::kernelVersion()));
+    js_os_info.insert("pretty_name", QJsonValue::fromVariant(QSysInfo::prettyProductName()));
+    js_system_info.insert("os_info", js_os_info);
 
     BiosInfo* bios_info = BiosFactory::Instance()->getBiosInfo();
     CpuInfo* cpu_info = CpuFactory::Instance()->getCpuInfo();
     ResourcesInfo* res_info = ResourcesFactory::Instance()->getResourcesInfo();
 
-    out << "System HW Manufacturer: " << bios_info->getHwManufacturer() << endl;
-    out << "System HW Model: " << bios_info->getHwModel() << endl;
+    js_hw_info.insert("sys_manufacturer", QJsonValue::fromVariant(bios_info->getHwManufacturer()));
+    js_hw_info.insert("sys_model", QJsonValue::fromVariant(bios_info->getHwModel()));
 
-    out << "Cpu Model: " << cpu_info->getCpuModel() << endl;
-    out << "Cpu Manufacturer: " << cpu_info->getCpuManufacturer() << endl;
-    out << "Cpu Arch: "  << QSysInfo::currentCpuArchitecture() << endl;
-    out << "Logical Processors: " << QThread::idealThreadCount() << endl;
-    out << "Physical Processors: " << cpu_info->getCpuCount() << endl;
+    js_cpu_info.insert("cpu_model", QJsonValue::fromVariant(cpu_info->getCpuModel()));
+    js_cpu_info.insert("cpu_manuf", QJsonValue::fromVariant(cpu_info->getCpuManufacturer()));
+    js_cpu_info.insert("cpu_arch", QJsonValue::fromVariant(QSysInfo::currentCpuArchitecture()));
+    js_cpu_info.insert("logical_cpus", QJsonValue::fromVariant(QThread::idealThreadCount()));
+    js_cpu_info.insert("phys_cpus",  QJsonValue::fromVariant(cpu_info->getCpuCount()));
+    js_hw_info.insert("cpu_info", js_cpu_info);
+    js_system_info.insert("hw_info", js_hw_info);
 
-    out << "Total Memory Used: " << res_info->getTotalMemoryUsed() << endl;
-
-    out << "Cpu Load: " << res_info->getCpuLoad() << endl;
+    js_res_info.insert("mem_use", QJsonValue::fromVariant(res_info->getTotalMemoryUsed()));
+    js_res_info.insert("cpu_use", QJsonValue::fromVariant(res_info->getCpuLoad()));
+    js_system_info.insert("res_info", js_res_info);
 
     QStringList ports = res_info->getOpenPorts();
 
-    out << "\n*** Network connections ***\n";
-
-    out << "Proto;Local Address;Foreign Address;State;PID;Process Name" << endl;
-
     for(auto port : ports)
     {
-        out << port << endl;
+        js_ports.push_back(QJsonValue::fromVariant(port));
     }
 
-    out << "\n*** Network interfaces ***\n";
+    js_system_info.insert("ports_info", js_ports);
 
     for(auto interface : QNetworkInterface::allInterfaces())
     {
-        out << "IF: " << interface.humanReadableName();
-        out << " MAC Address# " << " : " << interface.hardwareAddress() << endl;
+        QJsonObject net_int;
+        net_int.insert("if", QJsonValue::fromVariant(interface.humanReadableName()));
+        net_int.insert("mac_addr", QJsonValue::fromVariant(interface.hardwareAddress()));
+        js_nets.push_back(net_int);
     }
+
+    js_system_info.insert("net_info", js_nets);
+
+    js_collected_data.insert("system_info", js_system_info);
+
+    QJsonDocument js_report(js_collected_data);
+
+    std::cout << js_report.toJson(QJsonDocument::JsonFormat::Indented).toStdString();
+
+    QString report_name {QSysInfo::machineHostName() + ".txt"};
+    QFile report{report_name};
+
+    if(!report.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qInfo() << "Error: Cannot create report file";
+        return -1;
+    }
+
+    QTextStream out(&report);
+
+    out << js_report.toJson(QJsonDocument::JsonFormat::Indented);
 
     const QString s3_filename = username + "%2F" + report_name;
     const QString local_path = "./" + report_name;
