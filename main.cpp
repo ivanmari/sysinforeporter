@@ -14,6 +14,9 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QDateTime>
+#include <QList>
+#include <QUuid>
+#include <QSettings>
 
 #include <iostream>
 
@@ -22,16 +25,29 @@
 #include "resourcesfactory.h"
 #include "s3uploader.h"
 #include "passwordreader.h"
-
+#include "restapi.h"
 #include "filepaths.h"
+#include "fileinfo.h"
+
+
+const QString AGENT_ID_KEY = "agent_id";
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     QCommandLineParser parser;
 
-    QCoreApplication::setApplicationName("System Info Report");
+    QCoreApplication::setApplicationName("SystemInfoReport");
+    QCoreApplication::setOrganizationName("MyCompany");
+    QCoreApplication::setOrganizationDomain("mycompany.com");
     QCoreApplication::setApplicationVersion("0.2.2");
+
+    QSettings app_settings;
+
+    if(!app_settings.contains(AGENT_ID_KEY))
+    {
+        app_settings.setValue(AGENT_ID_KEY, QUuid::createUuid());
+    }
 
     const QCommandLineOption userOption("u", "The username", "username");
     parser.addOption(userOption);
@@ -49,7 +65,6 @@ int main(int argc, char *argv[])
                      qPrintable(QCoreApplication::applicationVersion());
         return 0;
     }
-
 
     QString username;
 
@@ -81,44 +96,18 @@ int main(int argc, char *argv[])
     QJsonObject js_res_info;
     QJsonArray js_ports;
     QJsonArray js_nets;
-    QJsonArray js_files;
 
     js_collected_data.insert("timestamp", QJsonValue::fromVariant(QDateTime::currentDateTimeUtc()));
 
-    qInfo() << "Processing files. This could take several minutes ...";
+    js_collected_data.insert("agent_id", QJsonValue::fromVariant(app_settings.value(AGENT_ID_KEY)));
 
-    std::vector<QRegularExpression> regexes;
-
-    for(auto path : paths)
-    {
-        regexes.push_back(QRegularExpression(path, QRegularExpression::CaseInsensitiveOption));
-    }
-
-#ifdef  QT_NO_DEBUG
     if(!parser.isSet(disableSearchOption))
     {
-        for(auto drive: QDir::drives())
-        {
-            QDirIterator it(drive.path(), QDir::AllEntries | QDir::System | QDir::Hidden, QDirIterator::Subdirectories);
-            while (it.hasNext()) {
-                QString path = it.next();
-
-                for(auto re : regexes)
-                {
-                    QRegularExpressionMatch match = re.match(path);
-                    if(match.hasMatch())
-                    {
-                        QFileInfo file_info(match.captured(0));
-                        js_files.push_back(QJsonValue::fromVariant(file_info.absoluteFilePath()));
-                    }
-                }
-                //QThread::msleep(1);
-            }
-        }
+        qInfo() << "Processing files. This could take several minutes ...";
+        QJsonArray js_files = FileInfo::findFiles(paths);
+        js_system_info.insert("files", js_files);
     }
 
-#endif  //QT_NO_DEBUG
-    js_system_info.insert("files", js_files);
     js_system_info.insert("server_name", QJsonValue::fromVariant(QSysInfo::machineHostName()));
 
     js_os_info.insert("kernel_type", QJsonValue::fromVariant(QSysInfo::kernelType()));

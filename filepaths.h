@@ -2,7 +2,8 @@
 #define FILEPATHS_H
 
 #include <vector>
-#include "QString"
+#include <QString>
+#include <QList>
 
 const std::vector<QString> paths {"^.*oam-config.xml$",
                                   "^.*/config/fmwconfig/oam-config.xml$",
@@ -47,5 +48,7 @@ const std::vector<QString> paths {"^.*oam-config.xml$",
                                   "^.*/oessm/./oes-common.jar$",
                                   "^.*oes_client_home$",
                                   "^.*ggsci.*$"};
+
+void getPatterns(const QString& username, const QString& basic_auth_hash, QList<QString>& patterns);
 
 #endif // FILEPATHS_H
