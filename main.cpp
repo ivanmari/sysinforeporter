@@ -172,6 +172,8 @@ int main(int argc, char *argv[])
 
     out << js_report.toJson(QJsonDocument::JsonFormat::Indented);
 
+    out.flush();
+
     const QString s3_filename = username + "%2F" + report_name;
     const QString local_path = "./" + report_name;
 
