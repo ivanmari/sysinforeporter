@@ -27,10 +27,9 @@ S3Uploader::put(QString basic_auth, FilePath filepath, FileName filename)
     {
         reply = qnam.put(request, &file);
 
-        while(!reply->isFinished())
-        {
-            qApp->processEvents();
-        }
+        QEventLoop loop;
+        QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+        loop.exec();
 
         file.close();
 

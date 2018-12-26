@@ -34,7 +34,8 @@ SOURCES += \
     restapi.cpp \
     filepaths.cpp \
     fileinfo.cpp \
-    processinfo.cpp
+    processinfo.cpp \
+    third_party/QProcessInfo/qprocessinfo.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -62,4 +63,5 @@ HEADERS += \
     passwordreader.h \
     restapi.h \
     fileinfo.h \
-    processinfo.h
+    processinfo.h \
+    third_party/QProcessInfo/qprocessinfo.h

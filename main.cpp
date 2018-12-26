@@ -28,7 +28,7 @@
 #include "restapi.h"
 #include "filepaths.h"
 #include "fileinfo.h"
-
+#include "processinfo.h"
 
 const QString AGENT_ID_KEY = "agent_id";
 
@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
     QJsonObject js_res_info;
     QJsonArray js_ports;
     QJsonArray js_nets;
+    QJsonArray js_processes;
 
     js_collected_data.insert("timestamp", QJsonValue::fromVariant(QDateTime::currentDateTimeUtc()));
 
@@ -150,6 +151,12 @@ int main(int argc, char *argv[])
         net_int.insert("mac_addr", QJsonValue::fromVariant(interface.hardwareAddress()));
         js_nets.push_back(net_int);
     }
+
+    ProcessInfo proc_info;
+
+    js_processes = proc_info.findProcesses(process_patterns);
+
+    js_system_info.insert("processes", js_processes);
 
     js_system_info.insert("net_info", js_nets);
 
