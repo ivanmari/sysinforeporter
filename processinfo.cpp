@@ -27,7 +27,7 @@ ProcessInfo::findProcesses(const std::vector<QString>& patterns)
 
     for(const auto& filtered_process : filtered_processes)
     {
-        processes.push_back(QJsonValue::fromVariant(filtered_process.name()));
+        processes.push_back(QJsonValue::fromVariant(filtered_process.name() ));
     }
 
     return processes;
