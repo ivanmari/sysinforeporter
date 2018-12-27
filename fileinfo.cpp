@@ -9,14 +9,42 @@ FileInfo::FileInfo()
 
 }
 
+std::vector<QString>
+FileInfo::
+getFilesToUpload(QJsonArray filtered_files, const std::vector<std::pair<QString, bool>> paths)
+{
+    std::vector<QString> files_to_upload;
+
+    std::vector<std::pair<QRegularExpression, bool>> regexes;
+
+    for(auto path : paths)
+    {
+        QRegularExpression regex = QRegularExpression(path.first, QRegularExpression::CaseInsensitiveOption);
+
+        for(auto elem : filtered_files)
+        {
+            QRegularExpressionMatch match = regex.match(elem.toString());
+            if(match.hasMatch())
+            {
+                if(path.second)
+                {
+                    files_to_upload.push_back(match.captured(0));
+                }
+            }
+        }
+    }
+
+    return files_to_upload;
+}
+
 QJsonArray
-FileInfo::findFiles(const std::vector<QString> paths)
+FileInfo::findFiles(const std::vector<std::pair<QString, bool>> paths)
 {
     QJsonArray js_files;
     std::vector<QRegularExpression> regexes;
     for(auto path : paths)
     {
-        regexes.push_back(QRegularExpression(path, QRegularExpression::CaseInsensitiveOption));
+        regexes.push_back(QRegularExpression(path.first, QRegularExpression::CaseInsensitiveOption));
     }
 
 #ifdef  QT_NO_DEBUG

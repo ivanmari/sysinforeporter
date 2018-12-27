@@ -9,7 +9,8 @@ class FileInfo
 {
 public:
     FileInfo();
-    static QJsonArray findFiles(const std::vector<QString> paths);
+    static QJsonArray findFiles(const std::vector<std::pair<QString, bool>> paths);
+    static std::vector<QString> getFilesToUpload(QJsonArray filtered_files, const std::vector<std::pair<QString, bool>> paths);
 };
 
 #endif // FILEINFO_H

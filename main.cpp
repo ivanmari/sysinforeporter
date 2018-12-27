@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     QJsonArray js_ports;
     QJsonArray js_nets;
     QJsonArray js_processes;
-
+    QJsonArray js_files;
     js_collected_data.insert("timestamp", QJsonValue::fromVariant(QDateTime::currentDateTimeUtc()));
 
     js_collected_data.insert("agent_id", QJsonValue::fromVariant(app_settings.value(AGENT_ID_KEY)));
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
     if(!parser.isSet(disableSearchOption))
     {
         qInfo() << "Processing files. This could take several minutes ...";
-        QJsonArray js_files = FileInfo::findFiles(paths);
+        js_files = FileInfo::findFiles(paths);
         js_system_info.insert("files", js_files);
     }
 
@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 
     QJsonDocument js_report(js_collected_data);
 
-    std::cout << js_report.toJson(QJsonDocument::JsonFormat::Indented).toStdString();
+    //std::cout << js_report.toJson(QJsonDocument::JsonFormat::Indented).toStdString();
 
     QString report_name {QSysInfo::machineHostName() + ".txt"};
     QFile report{report_name};
@@ -181,12 +181,21 @@ int main(int argc, char *argv[])
 
     out.flush();
 
-    const QString s3_filename = username + "%2F" + report_name;
+    const QString s3_base_path = username + "%2F" + app_settings.value(AGENT_ID_KEY).toString();
+    const QString s3_filename = s3_base_path + "%2F" + report_name;
     const QString local_path = "./" + report_name;
 
     qInfo() << "Uploading report";
 
     S3Uploader::put(headerData, local_path, s3_filename);
+
+    std::vector<QString> files_to_upload = FileInfo::getFilesToUpload(js_files, paths);
+
+    for(auto filename_to_upload : files_to_upload)
+    {
+        QList<QString> splitted_path = filename_to_upload.split("/");
+        S3Uploader::put(headerData, filename_to_upload, s3_base_path + "%2F" + splitted_path.back());
+    }
 
     qInfo() << "Done!";
 
