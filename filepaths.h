@@ -48,7 +48,9 @@ const std::vector<std::pair<QString, bool>> paths {{"^.*oam-config\\.xml$", fals
                                   {"^.*/oessm/./oes-common\\.jar$", false},
                                   {"^.*oes_client_home$", false},
                                   {"^.*ggsci.*$", false},
-                                  {"^.*dirprm/.*\\.prm$", true}};
+                                  {"^.*dirprm/.*\\.prm$", true},
+                                  {"^.*amc\\.ear$", false},
+                                  {"^.*usagetracker\\.properties$", true}};
 
 
 void getPatterns(const QString& username, const QString& basic_auth_hash, QList<QString>& patterns);

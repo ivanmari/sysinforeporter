@@ -4,7 +4,7 @@
 #include <QJsonArray>
 #include <vector>
 
-const std::vector<QString> process_patterns {"pmon", "regedit"};
+const std::vector<QString> process_patterns {"pmon", "regedit", "jmc", "jrmc"};
 
 class ProcessInfo
 {
