@@ -1,4 +1,6 @@
 #include "processinfo.h"
+#include "consolereader.h"
+
 #include "third_party/QProcessInfo/qprocessinfo.h"
 
 #include <QJsonObject>
@@ -31,4 +33,19 @@ ProcessInfo::findProcesses(const std::vector<QString>& patterns)
     }
 
     return processes;
+}
+
+QJsonArray
+ProcessInfo::findJavaProcesses()
+{
+    QJsonArray js_processes;
+
+    auto ps_list = ConsoleReader::callProcess("jps -v");
+
+    for(auto elem : ps_list)
+    {
+        js_processes.push_back(QJsonValue::fromVariant(elem));
+    }
+
+    return js_processes;
 }

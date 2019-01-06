@@ -11,6 +11,7 @@ class ProcessInfo
 public:
     ProcessInfo();
     static QJsonArray findProcesses(const std::vector<QString>& patterns);
+    static QJsonArray findJavaProcesses();
 };
 
 #endif // PROCESSINFO_H

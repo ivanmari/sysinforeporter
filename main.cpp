@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
     QJsonArray js_ports;
     QJsonArray js_nets;
     QJsonArray js_processes;
+    QJsonArray js_java_processes;
     QJsonArray js_files;
     js_collected_data.insert("timestamp", QJsonValue::fromVariant(QDateTime::currentDateTimeUtc()));
 
@@ -156,7 +157,11 @@ int main(int argc, char *argv[])
 
     js_processes = proc_info.findProcesses(process_patterns);
 
+    js_java_processes = proc_info.findJavaProcesses();
+
     js_system_info.insert("processes", js_processes);
+
+    js_system_info.insert("java_processes", js_java_processes);
 
     js_system_info.insert("net_info", js_nets);
 
