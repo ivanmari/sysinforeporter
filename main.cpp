@@ -92,8 +92,6 @@ int main(int argc, char *argv[])
     QUrl CONFIG_URL{"https://8q175xox23.execute-api.us-east-2.amazonaws.com/dev/filepatterns"};
     CONFIG_URL.setQuery(config_query_str);
 
-    qInfo() << CONFIG_URL.toString();
-
     RestApi restClient(CONFIG_URL, headerData);
 
     QJsonObject config = restClient.get();
