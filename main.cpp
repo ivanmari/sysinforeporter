@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("SystemInfoReport");
     QCoreApplication::setOrganizationName("MyCompany");
     QCoreApplication::setOrganizationDomain("mycompany.com");
-    QCoreApplication::setApplicationVersion("0.3.3");
+    QCoreApplication::setApplicationVersion("0.3.4");
 
     QSettings app_settings;
 
