@@ -88,6 +88,36 @@ int main(int argc, char *argv[])
     concatenated.clear();
     data.clear();
 
+    QString config_query_str = "user=" + username;
+    QUrl CONFIG_URL{"https://8q175xox23.execute-api.us-east-2.amazonaws.com/dev/filepatterns"};
+    CONFIG_URL.setQuery(config_query_str);
+
+    qInfo() << CONFIG_URL.toString();
+
+    RestApi restClient(CONFIG_URL, headerData);
+
+    QJsonObject config = restClient.get();
+
+    std::vector<std::pair<QString, bool>> filepaths;
+
+    //Ads the default paths patterns
+    std::copy(paths.begin(), paths.end(),std::back_inserter(filepaths));
+
+    QString PATTERN {"pattern"};
+    QString UPLOAD {"upload"};
+
+    if(config["data"].isArray())
+    {
+        for(auto elem : config["data"].toArray())
+        {
+            filepaths.push_back(std::make_pair(elem.toObject()[PATTERN].toString(), elem.toObject()[UPLOAD].toBool()));
+        }
+    }
+    else
+    {
+        qInfo() << "Client could not be configured";
+    }
+
     QJsonObject js_collected_data;
     QJsonObject js_system_info;
     QJsonObject js_os_info;
@@ -106,7 +136,7 @@ int main(int argc, char *argv[])
     if(!parser.isSet(disableSearchOption))
     {
         qInfo() << "Processing files. This could take several minutes ...";
-        js_files = FileInfo::findFiles(paths);
+        js_files = FileInfo::findFiles(filepaths);
         js_system_info.insert("files", js_files);
     }
 

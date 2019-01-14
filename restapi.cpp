@@ -65,5 +65,21 @@ RestApi::get()
         qInfo() << "Error sending get: " << m_reply->error();
     }
 
-    return QJsonDocument::fromJson(m_reply->readAll()).object();
+    QJsonObject json;
+    QJsonDocument json_doc =  QJsonDocument::fromJson(m_reply->readAll());
+
+    if(!json_doc.isNull())
+    {
+        if(json_doc.isObject())
+        {
+            json.insert("data", json_doc.object());
+        }
+
+        if(json_doc.isArray())
+        {
+            json.insert("data", json_doc.array());
+        }
+    }
+
+    return json;
 }

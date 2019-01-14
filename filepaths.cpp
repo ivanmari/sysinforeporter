@@ -19,7 +19,7 @@ void getPatterns(const QString& username, const QString& basic_auth_hash, QList<
 
     RestApi rest(patterns_url, basic_auth_hash);
 
-    QJsonObject json = rest.get();
+    //QJsonObject json = rest.get();
 
-    patterns = json.value(PATTERNS_KEY).toString().split(",");
+    //patterns = json.value(PATTERNS_KEY).toString().split(",");
 }
