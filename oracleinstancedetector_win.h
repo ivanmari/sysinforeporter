@@ -3,6 +3,10 @@
 
 #include "oracleinstancedetector.h"
 
+#include <QtGlobal>
+
+#ifdef Q_OS_WIN
+
 class OracleInstanceDetector_Win : public OracleInstanceDetector
 {
 public:
@@ -10,5 +14,5 @@ public:
 
     QJsonArray getOracleInstances() const;
 };
-
+#endif //Q_OS_WIN
 #endif // ORACLEINSTANCEDETECTOR_WIN_H

@@ -3,6 +3,10 @@
 
 #include <iostream>
 
+#include <QtGlobal>
+
+#ifdef Q_OS_WIN
+
 OracleInstanceDetector_Win::OracleInstanceDetector_Win()
 {
 
@@ -12,7 +16,6 @@ OracleInstanceDetector_Win::OracleInstanceDetector_Win()
 QJsonArray
 OracleInstanceDetector_Win::getOracleInstances() const
 {
-
     QStringList services = ConsoleReader::callProcess("sc.exe queryex type= service state= all");
     QStringList filtered_services;
 
@@ -20,3 +23,4 @@ OracleInstanceDetector_Win::getOracleInstances() const
 
     return QJsonArray::fromStringList(filtered_services);
 }
+#endif //Q_OS_WIN

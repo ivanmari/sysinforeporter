@@ -29,7 +29,7 @@
 #include "filepaths.h"
 #include "fileinfo.h"
 #include "processinfo.h"
-#include "oracleinstancedetector_win.h"
+#include "orainstancedetectorfactory.h"
 
 const QString AGENT_ID_KEY = "agent_id";
 
@@ -190,9 +190,7 @@ int main(int argc, char *argv[])
 
     js_java_processes = proc_info.findJavaProcesses();
 
-    OracleInstanceDetector_Win ora_detector;
-
-    js_ora_instances = ora_detector.getOracleInstances();
+    js_ora_instances = OraInstanceDetectorFactory::Instance()->getOracleInstanceDetector()->getOracleInstances();
 
     js_system_info.insert("ora_instances", js_ora_instances);
 
