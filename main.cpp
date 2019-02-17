@@ -29,6 +29,7 @@
 #include "filepaths.h"
 #include "fileinfo.h"
 #include "processinfo.h"
+#include "oracleinstancedetector_win.h"
 
 const QString AGENT_ID_KEY = "agent_id";
 
@@ -127,6 +128,8 @@ int main(int argc, char *argv[])
     QJsonArray js_processes;
     QJsonArray js_java_processes;
     QJsonArray js_files;
+    QJsonArray js_ora_instances;
+
     js_collected_data.insert("timestamp", QJsonValue::fromVariant(QDateTime::currentDateTimeUtc()));
 
     js_collected_data.insert("agent_id", QJsonValue::fromVariant(app_settings.value(AGENT_ID_KEY)));
@@ -187,6 +190,12 @@ int main(int argc, char *argv[])
 
     js_java_processes = proc_info.findJavaProcesses();
 
+    OracleInstanceDetector_Win ora_detector;
+
+    js_ora_instances = ora_detector.getOracleInstances();
+
+    js_system_info.insert("ora_instances", js_ora_instances);
+
     js_system_info.insert("processes", js_processes);
 
     js_system_info.insert("java_processes", js_java_processes);
@@ -197,7 +206,7 @@ int main(int argc, char *argv[])
 
     QJsonDocument js_report(js_collected_data);
 
-    //std::cout << js_report.toJson(QJsonDocument::JsonFormat::Indented).toStdString();
+    std::cout << js_report.toJson(QJsonDocument::JsonFormat::Indented).toStdString();
 
     QString report_name {QSysInfo::machineHostName() + ".txt"};
     QFile report{report_name};
