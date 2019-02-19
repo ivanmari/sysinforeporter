@@ -37,7 +37,8 @@ SOURCES += \
     processinfo.cpp \
     third_party/QProcessInfo/qprocessinfo.cpp \
     oracleinstancedetector_win.cpp \
-    orainstancedetectorfactory.cpp
+    orainstancedetectorfactory.cpp \
+    oracleinstancedetector_linux.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -69,4 +70,5 @@ HEADERS += \
     third_party/QProcessInfo/qprocessinfo.h \
     oracleinstancedetector.h \
     oracleinstancedetector_win.h \
-    orainstancedetectorfactory.h
+    orainstancedetectorfactory.h \
+    oracleinstancedetector_linux.h

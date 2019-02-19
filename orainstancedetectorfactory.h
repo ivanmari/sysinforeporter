@@ -4,6 +4,7 @@
 #include "QtGlobal"
 
 #include "oracleinstancedetector_win.h"
+#include "oracleinstancedetector_linux.h"
 
 class OraInstanceDetectorFactory
 {
@@ -28,7 +29,7 @@ public:
     }
 
 private:
-    OraInstanceDetectorFactory(){}
+    OraInstanceDetectorFactory();
 };
 
 #endif // ORAINSTANCEDETECTORFACTORY_H

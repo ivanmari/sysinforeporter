@@ -12,7 +12,8 @@ class OracleInstanceDetector_Win : public OracleInstanceDetector
 public:
     OracleInstanceDetector_Win();
 
-    QJsonArray getOracleInstances() const;
+    QJsonArray getOracleInstances() const override;
 };
+
 #endif //Q_OS_WIN
 #endif // ORACLEINSTANCEDETECTOR_WIN_H
