@@ -13,6 +13,7 @@ public:
     OracleInstanceDetector_Win();
 
     QJsonArray getOracleInstances() const override;
+    QStringList extractSqlInfo(QString sid) const override;
 };
 
 #endif //Q_OS_WIN

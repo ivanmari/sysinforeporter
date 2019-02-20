@@ -237,6 +237,14 @@ int main(int argc, char *argv[])
         S3Uploader::put(headerData, filename_to_upload, s3_base_path + "%2F" + splitted_path.back());
     }
 
+    for(auto instance : js_ora_instances)
+    {
+        QString sid = instance.toString();
+
+        qInfo() << OraInstanceDetectorFactory::Instance()->getOracleInstanceDetector()->extractSqlInfo(sid);
+
+    }
+
     qInfo() << "Done!";
 
     return 0;

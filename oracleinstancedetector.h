@@ -7,6 +7,7 @@ class OracleInstanceDetector
 {
 public:
     virtual QJsonArray getOracleInstances() const = 0;
+    virtual QStringList extractSqlInfo(QString sid) const = 0;
 
     virtual ~OracleInstanceDetector(){}
 };
