@@ -43,8 +43,6 @@ OracleInstanceDetector_Win::extractSqlInfo(QString sid) const
 {
    QString exec = "cmd.exe /c \"set ORACLE_SID=" + sid + " & sqlplus / as sysdba < extract.sql\"";
 
-   std::cout << exec.toStdString() << std::endl;
-
    QStringList entries = ConsoleReader::callProcess(exec);
 
    return entries;

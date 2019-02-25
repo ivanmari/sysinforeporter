@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("SystemInfoReport");
     QCoreApplication::setOrganizationName("MyCompany");
     QCoreApplication::setOrganizationDomain("mycompany.com");
-    QCoreApplication::setApplicationVersion("0.3.4");
+    QCoreApplication::setApplicationVersion("0.4.0");
 
     QSettings app_settings;
 
@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
 
     QJsonDocument js_report(js_collected_data);
 
-    std::cout << js_report.toJson(QJsonDocument::JsonFormat::Indented).toStdString();
+    //std::cout << js_report.toJson(QJsonDocument::JsonFormat::Indented).toStdString();
 
     QString report_name {QSysInfo::machineHostName() + ".txt"};
     QFile report{report_name};
@@ -241,8 +241,23 @@ int main(int argc, char *argv[])
     {
         QString sid = instance.toString();
 
-        qInfo() << OraInstanceDetectorFactory::Instance()->getOracleInstanceDetector()->extractSqlInfo(sid);
+        QString instance_report_name {QSysInfo::machineHostName() + "_" +sid + ".txt"};
+        QFile instance_report{instance_report_name};
 
+        if(!instance_report.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            qInfo() << "Error: Cannot create instance report file";
+            return -1;
+        }
+
+        QTextStream instance_out(&instance_report);
+
+        for(auto line : OraInstanceDetectorFactory::Instance()->getOracleInstanceDetector()->extractSqlInfo(sid))
+        {
+            instance_out << line;
+        }
+
+        S3Uploader::put(headerData, instance_report_name, s3_base_path + "%2F" + instance_report_name);
     }
 
     qInfo() << "Done!";
