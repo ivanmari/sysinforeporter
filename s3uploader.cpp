@@ -3,7 +3,7 @@
 #include <QtNetwork>
 #include <QUrl>
 
-const char S3_BUCKET_URL[] = "https://m3g1gv22f9.execute-api.us-east-2.amazonaws.com/int/sysinforeport-dev";
+const char S3_BUCKET_URL[] = "https://ew6gtfhia7.execute-api.us-west-1.amazonaws.com/dev/sysinforeport";
 
 
 void

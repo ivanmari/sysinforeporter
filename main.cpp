@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("SystemInfoReport");
     QCoreApplication::setOrganizationName("MyCompany");
     QCoreApplication::setOrganizationDomain("mycompany.com");
-    QCoreApplication::setApplicationVersion("0.4.0");
+    QCoreApplication::setApplicationVersion("1.0.0");
 
     QSettings app_settings;
 
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     data.clear();
 
     QString config_query_str = "user=" + username;
-    QUrl CONFIG_URL{"https://8q175xox23.execute-api.us-east-2.amazonaws.com/dev/filepatterns"};
+    QUrl CONFIG_URL{"https://bacsgi4blk.execute-api.us-west-1.amazonaws.com/dev/filepatterns"};
     CONFIG_URL.setQuery(config_query_str);
 
     RestApi restClient(CONFIG_URL, headerData);
